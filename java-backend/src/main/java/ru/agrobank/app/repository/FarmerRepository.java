@@ -21,4 +21,15 @@ public class FarmerRepository {
     public Map<String, Farmer> getAllFarmers() {
         return farmersDb;
     }
+    public void printAllFarmers(){
+        Set<String> iins = farmersDb.keySet();
+        for(String iin : iins){
+            System.out.println(iin + " " + farmersDb.get(iin));
+        }
+    }
+
+    public void addNewFarmer(Farmer farmer){
+        farmersDb.put(farmer.getInn(), farmer);
+    }
+
 }

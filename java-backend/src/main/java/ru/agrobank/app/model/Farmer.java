@@ -15,7 +15,7 @@ public class Farmer extends Person {
     public double getFarmArea() { return farmArea; }
     public List<Double> getHistoryYield() { return historyYield; }
 
-    public double getAverageYield() {
+    public double getAverageYield() { // расчет средней урожайности Фермера
         if (historyYield == null || historyYield.isEmpty()) return 0.0;
         double sum = 0;
         for (double y : historyYield) {
@@ -29,5 +29,14 @@ public class Farmer extends Person {
         if (avg >= 30) return "Низкий";
         else if (avg >= 20) return "Средний";
         else return "Высокий";
+    }
+
+    @Override
+    public String toString() {
+        return "Farmer{" +
+                name + '\'' +
+                ", История урожайности=" + historyYield +
+                ", Область грядки=" + farmArea +
+                '}';
     }
 }

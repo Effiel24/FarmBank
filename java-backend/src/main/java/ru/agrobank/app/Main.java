@@ -9,8 +9,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class Main {
-    private static final FarmerRepository farmerRepo = new FarmerRepository();
-    private static final ProductRepository productRepo = new ProductRepository();
+    private static FarmerRepository farmerRepo = new FarmerRepository();
+    private static ProductRepository productRepo = new ProductRepository();
     private static final BankService bankService = new BankService();
 
     // Списки для хранения финальной истории за сессию на стороне Java
@@ -26,9 +26,11 @@ public class Main {
             System.out.println("📊 Текущее состояние очереди Java: " + bankService.getQueueSize());
             System.out.println("-".repeat(50));
             System.out.println("1. 📝 Подать новую заявку");
-            System.out.println("2. ⚙️  Обработать рабочий день (пакет из 3 заявок на Python)");
-            System.out.println("3. 📈 Отчет по рискам (Сортировка через Java Stream API)");
-            System.out.println("4. 🚨 Показать фермеров высокого риска (Фильтрация)");
+            System.out.println("2. ➕ Добавить нового пользователя");
+            System.out.println("3. ⚙️  Обработать рабочий день");
+            System.out.println("4. 📈 Отчет по рискам (Сортировка через Stream API)");
+            System.out.println("5. 🚨 Показать фермеров высокого риска (Фильтрация)");
+            System.out.println("6. 📋 Вывести список всех пользователей");
             System.out.println("0. 🚪 Выход");
             System.out.println("=".repeat(50));
             System.out.print("Выберите действие: ");
@@ -68,7 +70,76 @@ public class Main {
                     System.out.println("❌ Ошибка ввода.");
                 }
 
-            } else if (choice.equals("2")) {
+            }
+            else if(choice.equals("2")){
+                System.out.println("\n➕ Регистрация нового фермера в системе");
+                System.out.println("-".repeat(50));
+
+                System.out.print("Введите ФИО фермера: ");
+                String name = scanner.nextLine().trim();
+
+                // Валидация ИНН в цикле, пока пользователь не введет корректный
+                String inn = "";
+                while (true) {
+                    System.out.print("Введите ИНН (10 или 12 цифр): ");
+                    inn = scanner.nextLine().trim();
+
+                    // Регулярное выражение: \\d означает цифру, {10} или {12} — количество повторений
+                    if (!inn.matches("\\d{10}") && !inn.matches("\\d{12}")) {
+                        System.out.println("❌ Ошибка: ИНН должен состоять только из цифр и содержать ровно 10 или 12 символов!");
+                        continue;
+                    }
+                    break; // Если проверка пройдена, выходим из цикла валидации ИНН
+                }
+
+                if (farmerRepo.findByInn(inn) != null) {
+                    System.out.println("❌ Ошибка: Фермер с таким ИНН уже зарегистрирован!");
+                    continue;
+                }
+
+                System.out.print("Введите общую площадь полей (га): ");
+                double area = 0.0;
+                try {
+                    area = Double.parseDouble(scanner.nextLine().trim());
+                    if (area <= 0) {
+                        System.out.println("❌ Ошибка: Площадь должна быть больше нуля!");
+                        continue;
+                    }
+                } catch (Exception e) {
+                    System.out.println("❌ Ошибка: Неверный формат площади! Используйте точку для дробей.");
+                    continue;
+                }
+
+                List<Double> yields = new ArrayList<>();
+                System.out.println("📊 Введите историю урожайности (ц/га) за последние годы.");
+                System.out.println("(Вводите числа по одному. Чтобы закончить, введите 'stop')");
+
+                while (true) {
+                    System.out.print("Урожайность (или 'stop'): ");
+                    String input = scanner.nextLine().trim();
+                    if (input.equalsIgnoreCase("stop")) {
+                        break;
+                    }
+                    try {
+                        double yld = Double.parseDouble(input);
+                        if (yld < 0) {
+                            System.out.println("❌ Урожайность не может быть отрицательной!");
+                            continue;
+                        }
+                        yields.add(yld);
+                    } catch (Exception e) {
+                        System.out.println("❌ Неверное число! Используйте точку или введите 'stop'.");
+                    }
+                }
+
+                Farmer newFarmer = new Farmer(name, inn, area, yields);
+                farmerRepo.addNewFarmer(newFarmer);
+
+                System.out.println("\n✅ Фермер успешно добавлен в локальную базу данных!");
+                System.out.printf("👨‍🌾 %s | Сформированный риск-профиль Java: %s\n",
+                        newFarmer.getName(), newFarmer.getRiskLevel());
+            }
+            else if (choice.equals("3")) {
                 System.out.println("\n⚙️  Отправляем пакет заявок на сетевой скоринг в Python...");
                 List<String> responses = bankService.processDayQueue(3);
 
@@ -93,7 +164,8 @@ public class Main {
                 }
                 System.out.println("-".repeat(50));
 
-            } else if (choice.equals("3")) {
+            }
+            else if (choice.equals("4")) {
                 if (approvedHistory.isEmpty()) {
                     System.out.println("\n📭 Нет одобренных полисов для построения отчета.");
                     continue;
@@ -105,7 +177,8 @@ public class Main {
                                 BankService.getValueFromJson(json, "app_id"),
                                 BankService.getValueFromJson(json, "final_price")));
 
-            } else if (choice.equals("4")) {
+            }
+            else if (choice.equals("5")) {
                 System.out.println("\n🚨 ФИЛЬТРАЦИЯ СИСТЕМЫ: ФЕРМЕРЫ В КРИТИЧЕСКОЙ ЗОНЕ РИСКА:");
                 List<Farmer> highRisk = farmerRepo.getAllFarmers().values().stream()
                         .filter(f -> f.getRiskLevel().equals("Высокий"))
@@ -117,11 +190,15 @@ public class Main {
                     highRisk.forEach(f -> System.out.printf("  ❌ %s | ИНН: %s | Средняя урожайность: %.1f ц/га\n",
                             f.getName(), f.getInn(), f.getAverageYield()));
                 }
-
-            } else if (choice.equals("0")) {
+            }
+            else if(choice.equals("6")){
+                farmerRepo.printAllFarmers();
+            }
+            else if (choice.equals("0")) {
                 System.out.println("🌾 Спасибо за работу с AgroBank!");
                 break;
             }
+
         }
     }
 }
