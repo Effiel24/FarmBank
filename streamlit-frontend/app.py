@@ -6,7 +6,7 @@ st.set_page_config(page_title="AgroBank — Streamlit Frontend", layout="centere
 
 st.title("AgroBank — Интерактивный фронтенд (Streamlit)")
 
-BASE_URL = st.sidebar.text_input("Python service URL", "http://localhost:8000")
+BASE_URL = st.sidebar.text_input("Java Backend URL", "http://localhost:8080")
 
 # Известные тестовые ИНН (возьмутся из локальной БД python-service)
 sample_inns = ["1234567890", "9876543210", "5555555555", "1111111111"]
@@ -83,4 +83,4 @@ if st.button("Отправить заявку на скоринг"):
             st.error(f"Ошибка при отправке заявки: {e}")
 
 st.write('\n')
-st.caption("Примечание: для корректной работы убедитесь, что python-service запущен по адресу, указанному в боковой панели.")
+st.caption("Примечание: для корректной работы убедитесь, что Java Backend запущен на 8080, а Python сервис на 8000.")

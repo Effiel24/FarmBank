@@ -29,7 +29,7 @@ class Farmer(Person):
             return "Высокий"
 
 
-# --- 2. Pydantic-схемы для REST API (Обмен данными с Java) ---
+# Обмен данными с Java backend
 
 class FarmerSchema(BaseModel):
     name: str

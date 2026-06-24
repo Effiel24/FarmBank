@@ -8,7 +8,7 @@ app = FastAPI(
     description="Микросервис скоринга рисков и андеррайтинга для страхования урожая"
 )
 
-# --- Локальная база данных (In-Memory DB, переехавшая из data.py) ---
+# Локальная БД
 FARMERS_DB = {
     "1234567890": Farmer("Иван Петров", "1234567890", 120.5, [28.5, 32.1, 30.4, 29.8]),
     "9876543210": Farmer("Мария Смирнова", "9876543210", 85.0, [18.2, 16.5, 19.0, 17.8]),
@@ -23,7 +23,7 @@ PRODUCTS_DB = [
 ]
 
 
-# --- ЭНДПОИНТЫ API ---
+# Эндпоинты
 
 @app.get("/")
 def health_check():
@@ -69,7 +69,7 @@ def process_application(request: ScoringRequest):
 
     avg_yield = farmer.get_average_yield()
 
-    # 1. Проверка жесткого лимита урожайности (Бизнес-логика скоринга)
+    # 1. Проверка жесткого лимита урожайности
     if avg_yield < 15:
         return {
             "app_id": request.app_id,
@@ -81,7 +81,7 @@ def process_application(request: ScoringRequest):
             "average_yield": round(avg_yield, 2)
         }
 
-    # 2. Имитация динамического метеорологического риска (15% вероятность форс-мажора)
+    # 2. Имитация динамического метеорологического риска
     if random.random() < 0.15:
         return {
             "app_id": request.app_id,

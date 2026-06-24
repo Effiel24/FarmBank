@@ -72,8 +72,7 @@ public class BankService {
         }
         return results;
     }
-
-    // --- УМНЫЙ СЕЙФ-ПАРСЕР JSON (ДЛЯ РАБОТЫ С СЕТЕВЫМИ СТРОКАМИ БЕЗ БИБЛИОТЕК) ---
+    // Парсер JSON
     public static String getValueFromJson(String json, String key) {
         if (json == null || !json.contains("\"" + key + "\"")) return "";
         try {
