@@ -1,0 +1,33 @@
+# === Java / IntelliJ IDEA ===
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+target/
+build/
+.gradle/
+/local.properties
+
+# === Python ===
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+.pytest_cache/
+.mypy_cache/
+
+# === Системные файлы ===
+.DS_Store
+.DS_Store?
+._*
+ThThumbs.db
+ehthumbs.db
+Log.txt
+*.log
